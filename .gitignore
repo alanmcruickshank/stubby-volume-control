@@ -1,0 +1,9 @@
+# Ignore Sublime files
+*.sublime-project
+*.sublime-workspace
+
+# Ignore GCODE files throughout
+*.gcode
+
+# Ignore any stl files in the scad directory. The only stl files committed should be the ones in the release folders.
+scad/*.stl
