@@ -2,9 +2,9 @@
 A distinctly over engineered USB volume control designed in OpenSCAD and programmed using Arduino
 
 ## Contents
-- [Design](scad/design.md)
-- [Programming](cpp/programming.md)
-- [Assembly](docs/assembly.md)
+- [Design](/scad/design.md)
+- [Programming](/cpp/programming.md)
+- [Assembly](/docs/assembly.md)
 
 ## TODO
 
