@@ -8,8 +8,6 @@ A distinctly over engineered USB volume control designed in OpenSCAD and program
 
 ## TODO
 
-- Add some pictures
 - Add all the scad files and some explanation of what they do (a branch for the original version first and then a dev branch for the new version)
-- Actually get the firmware to work without the trinket library!
 - Add a full set of stl files and the tag that as a *release* before changing them all.
 - Add some docs around print settings for best results, especially for the geared components. i.e. RAFTS!

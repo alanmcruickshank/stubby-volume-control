@@ -4,6 +4,9 @@ use <alpha/Gears.scad>
 use <alpha/UnderCarrier.scad>
 use <alpha/GearCarrier.scad>
 
+use <alpha/CentreButton.scad>
+use <alpha/EncoderGrip.scad>
+
 //$fa = 6;
 //$fs = 0.4;
 
@@ -33,5 +36,18 @@ module gearbox_assembly(){
         for (i = [0:4]) {
             rotate([0,0,i*72]) translate ([8,0,10]) m3_bolt(18);
         }
+        
+        // Button Assembly
+        translate([0,0,16]) button_assembly();
+    }
+}
+
+
+module button_assembly(){
+    union(){
+        rotate([180,0,0]) centre_button();
+        translate([0,0,-3]) m3_bolt(5);
+        translate([0,0,-(11.5+4)]) encoder_grip();
+        translate([0,0,-7.5]) m3_nut();
     }
 }
