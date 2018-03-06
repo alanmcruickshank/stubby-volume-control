@@ -7,10 +7,19 @@ use <alpha/GearCarrier.scad>
 use <alpha/CentreButton.scad>
 use <alpha/EncoderGrip.scad>
 
+use <alpha/UnderStator.scad>
+use <alpha/LightRing.scad>
+use <alpha/LightRingSpacer.scad>
+use <alpha/ElectroHousing.scad>
+use <alpha/BasePlate.scad>
+
 //$fa = 6;
 //$fs = 0.4;
 
-gearbox_assembly();
+union(){
+    gearbox_assembly();
+    lower_assembly();
+}
 
 
 module gearbox_assembly(){
@@ -51,3 +60,30 @@ module button_assembly(){
         translate([0,0,-7.5]) m3_nut();
     }
 }
+
+
+module lower_assembly(){
+    translate([0,0,-9]) union(){
+        under_stator();
+        color([1,1,0]) rotate([180,0,0]) light_ring();
+        translate([0,0,-6]) light_ring_spacer();
+        
+        translate([0,0,-6]) rotate([180,0,0]) electro_housing();
+        
+        translate([0,0,-16]) rotate([180,0,0]) base_plate();
+        
+        for (i=[0:4]) {
+            // central screw mounting nuts
+            rotate([0,0,i*72]) translate([8,0,2.75]) m3_nut();
+            // outer mounting screws
+            rotate([0,0,i*72]) translate([-27.5,0,1.5]) m3_bolt(12);
+            // outer mounting nuts
+            rotate([0,0,i*72]) translate([-27.5,0,-9.5]) m3_nut();
+            // base mounting nuts
+            rotate([0,0,i*72]) translate([-27.5,0,-14.5]) m3_nut();
+            // base mounting screws
+            rotate([0,0,i*72]) translate([-27.5,0,-17]) rotate([180,0,0]) m3_bolt(5);
+        }
+    }
+}
+
