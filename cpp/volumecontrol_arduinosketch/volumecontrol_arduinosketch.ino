@@ -17,6 +17,8 @@ int ps1 = 0;
 int ps2 = 0;
 int pm = 0;
 unsigned long bookmark_time;
+// initialise the buffer to keep track of track skipping
+int track_skip = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -50,11 +52,24 @@ void loop() {
   if (s != ps1) {
     if ((s == 2) && (ps1 == 3) && (ps2 == 1)) {
       out_d += SPIN_LED_IMPULSE;
-      //StubbyVolume.sendKeyStroke(KEY_VOL_UP);
-      TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_UP);
+      if (m == 1) {
+        // if the button is pressed then skip forward
+        TrinketHidCombo.pressMultimediaKey(MMKEY_SCAN_NEXT_TRACK);
+        track_skip++;
+      } else {
+        // if the button is not pressed then vol up
+        TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_UP);
+      }
     } else if ((s == 1) && (ps1 == 3) && (ps2 == 2)) {
       out_d -= SPIN_LED_IMPULSE;
-      TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_DOWN);
+      if (m == 1) {
+        // if the button is pressed then skip forward
+        TrinketHidCombo.pressMultimediaKey(MMKEY_SCAN_PREV_TRACK);
+        track_skip--;
+      } else {
+        // if the button is not pressed then vol up
+        TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_DOWN);
+      }
     }
 
     // make sure it doesn't overflow
@@ -75,9 +90,13 @@ void loop() {
 
     // is it a leading edge?
     if ((m == 1) && (pm == 0)) {
-      // it is so press the key and boost the led
-      TrinketHidCombo.pressMultimediaKey(MMKEY_PLAYPAUSE);
+      // it is so boost the led and reset track skip
       out_d = PLAYPAUSE_LED_LEVEL;
+      // reset the track buffer
+      track_skip = 0;
+    } else if (track_skip == 0) {
+      // if it's not a leading edge (i.e. it's a lagging edge) and there have been no track skips then play/pause
+      TrinketHidCombo.pressMultimediaKey(MMKEY_PLAYPAUSE);
     }
     // store old state
     pm = m;
