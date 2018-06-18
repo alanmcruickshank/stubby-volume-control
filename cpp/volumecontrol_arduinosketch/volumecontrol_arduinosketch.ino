@@ -11,6 +11,7 @@
 #define PLAYPAUSE_LED_LEVEL   220
 #define INIT_LED_LEVEL        220
 #define LED_REVERT_TIMEOUT    24
+#define DISCONN_LIMIT         200
 
 int out_d = INIT_LED_LEVEL;
 int ps1 = 0;
@@ -19,6 +20,7 @@ int pm = 0;
 unsigned long bookmark_time;
 // initialise the buffer to keep track of track skipping
 int track_skip = 0;
+int disconn_counter = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {
@@ -30,6 +32,8 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT); // Pause Button
   // initialise the first time at which we start to revert the LED
   bookmark_time = millis() + LED_REVERT_TIMEOUT;
+  // delay a little to allow to usb enumeration
+  delay(10);
 }
 
 // the loop routine runs over and over again forever:
@@ -113,8 +117,31 @@ void loop() {
     bookmark_time = millis() + LED_REVERT_TIMEOUT;
     // write the value
     analogWrite(LED_PIN, out_d);
-    // Send a polling stroke to remind the machine we're here
-    TrinketHidCombo.poll(); // do nothing, check if USB needs anything done
+    // check if we're connected. If not then reconnect
+    if (TrinketHidCombo.isConnected() == 0){
+      // Increment the disconnect counter
+      disconn_counter += 1;
+
+      // Mess with the output to approximate flashing
+      if (out_d < 32){
+        out_d = 254;
+      }
+
+      // Check if we've been disconnected long enough to warrant a reconnect
+      if (disconn_counter > DISCONN_LIMIT) {
+        // Force re-enumeration
+        TrinketHidCombo.begin();
+        delay(20);
+        TrinketHidCombo.poll();
+        // Reset counter so that we don't try too often
+        disconn_counter = 0;
+      }
+   } else {
+      // We're connected so reset the counter and poll
+      disconn_counter = 0;
+      // Send a polling stroke to remind the machine we're here (given we're already connected)
+      TrinketHidCombo.poll(); // do nothing, check if USB needs anything done
+   } 
   }
 }
 
