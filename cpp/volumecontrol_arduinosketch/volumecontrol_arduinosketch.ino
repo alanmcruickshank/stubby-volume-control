@@ -195,6 +195,8 @@ void loop() {
                 TrinketHidCombo.begin();
                 // Reset counter so that we don't try too often
                 disconn_counter = 0;
+                // Delay a little (100ms) post-reconnection to give things time to reassert themselves
+                delay(100);
             }
         }
         // Send a polling stroke to remind the machine we're here (given we're already connected)
