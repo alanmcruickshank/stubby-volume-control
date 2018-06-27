@@ -85,9 +85,9 @@ byte capped_move(byte current_val, char increment){
 /* reset the led timer */
 void reset_led_timer(){
     if (bump_active) {
-       bookmark_time = millis() + BUMP_LED_REVERT_TIMEOUT;
+        bookmark_time = millis() + BUMP_LED_REVERT_TIMEOUT;
     } else {
-       bookmark_time = millis() + LED_REVERT_TIMEOUT;
+        bookmark_time = millis() + LED_REVERT_TIMEOUT;
     }
 }
 
@@ -109,7 +109,7 @@ void loop() {
     // ################## Case 1
     // Filter encoder buffer to see if it's changed (3 = 00000011 so masks to just the first two bits)
     // brackets are important because == evaluates before &
-    if ((encoder_state_buffer & 0b11) != encoder_state){
+    if ((encoder_state_buffer & 0b11) != encoder_state) {
         // update the buffer
         encoder_state_buffer = (encoder_state_buffer << 2) + encoder_state;
         // detect turns of the encoder
@@ -117,32 +117,32 @@ void loop() {
             // if we can add the impulse without wraparound, then do so, otherwise cap
             bump_output_to(capped_move(out_d, SPIN_LED_IMPULSE));
             if (button_state) {
-              // if the button is pressed then skip forward
-              TrinketHidCombo.pressMultimediaKey(MMKEY_SCAN_NEXT_TRACK);
-              track_skip++;
+                // if the button is pressed then skip forward
+                TrinketHidCombo.pressMultimediaKey(MMKEY_SCAN_NEXT_TRACK);
+                track_skip++;
             } else {
-              // if the button is not pressed then vol up
-              TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_UP);
+                // if the button is not pressed then vol up
+                TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_UP);
             }
         } else if ((encoder_state_buffer & 0b111111) == EVENT_ANTICLOCK_TURN) {
             // if we can take the impulse without wraparound, then do so, otherwise cap
             bump_output_to(capped_move(out_d, -SPIN_LED_IMPULSE));
             if (button_state) {
-              // if the button is pressed then skip forward
-              TrinketHidCombo.pressMultimediaKey(MMKEY_SCAN_PREV_TRACK);
-              track_skip--;
+                // if the button is pressed then skip forward
+                TrinketHidCombo.pressMultimediaKey(MMKEY_SCAN_PREV_TRACK);
+                track_skip--;
             } else {
-              // if the button is not pressed then vol up
-              TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_DOWN);
+                // if the button is not pressed then vol up
+                TrinketHidCombo.pressMultimediaKey(MMKEY_VOL_DOWN);
             }
         }
     }
     // ################## Case 2
     // Filter butten buffer to see if it's changed (1 = 00000001 so masks to just the first bit)
-    else if ((button_state_buffer & 0b1) != button_state){
+    else if ((button_state_buffer & 0b1) != button_state) {
         button_state_buffer = (button_state_buffer << 1) + button_state;
         // is it a push or a release?
-        if (button_state){
+        if (button_state) {
             // push
             // ... so boost the led and reset track skip
             bump_output_to(PLAYPAUSE_LED_LEVEL);
@@ -154,22 +154,23 @@ void loop() {
         }
         // delay a little to debounce
         delay(2);
+    }
     // ################## Case 3
-    } else if (millis() > bookmark_time) {
+    else if (millis() > bookmark_time) {
         // No state change of buttons and the timeout on the fading has been reached
-        if (bump_active){
+        if (bump_active) {
             if (out_d < bump_target) {
-              out_d += 1;
+                out_d += 1;
             } else if (out_d > bump_target) {
-              out_d -= 1;
+                out_d -= 1;
             } else {
-              bump_active = false;
+                bump_active = false;
             }
         } else {
             if (out_d < led_set_point) {
-              out_d += 1;
+                out_d += 1;
             } else if (out_d > led_set_point) {
-              out_d -= 1;
+                out_d -= 1;
             }
         }
         // reset timer
@@ -182,7 +183,7 @@ void loop() {
             led_set_point = STEADY_LED_LEVEL;
             // We're connected so reset the counter and poll
             disconn_counter = 0;   
-         } else {
+        } else {
             // Increment the disconnect counter (to count the cycles we're disconnected
             // NB: this is cycles within the bookmark loop - so it's a slower loop than the main loop
             disconn_counter += 1;
@@ -195,26 +196,9 @@ void loop() {
                 // Reset counter so that we don't try too often
                 disconn_counter = 0;
             }
-         }
-         // Send a polling stroke to remind the machine we're here (given we're already connected)
-         TrinketHidCombo.poll(); // do nothing, check if USB needs anything done  
-         //NB: Polling even when not yet connected - forces the connection to initiate after a .begin() command
+        }
+        // Send a polling stroke to remind the machine we're here (given we're already connected)
+        TrinketHidCombo.poll(); // do nothing, check if USB needs anything done  
+        //NB: Polling even when not yet connected - forces the connection to initiate after a .begin() command
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
